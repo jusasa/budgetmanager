@@ -1,0 +1,713 @@
+/* FinWise Asset Analytics - Whitepace SaaS Design System */
+
+:root {
+  /* Whitepace SaaS Signature Palette */
+  --wp-navy-dark: #043873;
+  --wp-navy-deep: #022046;
+  --wp-blue-primary: #4F9CF9;
+  --wp-blue-hover: #3b82f6;
+  --wp-blue-light: #EBF4FE;
+  --wp-blue-tint: #F5F8FF;
+  --wp-yellow-accent: #FFE492;
+  --wp-yellow-hover: #ffd966;
+  
+  /* Canvas & Surfaces (Default: Whitepace Clean Crisp Light) */
+  --bg-app: #F5F8FF;
+  --bg-surface: #FFFFFF;
+  --bg-surface-elevated: #F8FAFC;
+  --bg-surface-glass: rgba(255, 255, 255, 0.92);
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #FAFCFF;
+
+  --border-subtle: #E2E8F0;
+  --border-strong: #CBD5E1;
+  --border-accent: rgba(79, 156, 249, 0.35);
+
+  --text-primary: #1E293B;
+  --text-secondary: #5A6B82;
+  --text-muted: #94A3B8;
+  --text-inverse: #FFFFFF;
+  --text-navy: #043873;
+
+  /* Financial Status Colors */
+  --color-income: #10B981;
+  --color-income-bg: #ECFDF5;
+  --color-expense: #EF4444;
+  --color-expense-bg: #FEF2F2;
+  --color-savings: #4F9CF9;
+  --color-savings-bg: #EFF6FF;
+  --color-warning: #F59E0B;
+  --color-warning-bg: #FFFBEB;
+
+  /* Shadows */
+  --shadow-sm: 0 2px 4px rgba(4, 56, 115, 0.04);
+  --shadow-md: 0 10px 30px rgba(4, 56, 115, 0.08);
+  --shadow-lg: 0 20px 45px rgba(4, 56, 115, 0.12);
+  --shadow-hover: 0 14px 36px rgba(79, 156, 249, 0.18);
+
+  /* Geometry */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 24px;
+  --radius-full: 9999px;
+
+  /* Fonts */
+  --font-main: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+  --font-display: 'Outfit', 'Pretendard', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+[data-theme='dark'] {
+  --bg-app: #03142e;
+  --bg-surface: #072048;
+  --bg-surface-elevated: #0a295c;
+  --bg-surface-glass: rgba(7, 32, 72, 0.9);
+  --bg-card: #082452;
+  --bg-card-hover: #0c316e;
+
+  --border-subtle: rgba(255, 255, 255, 0.09);
+  --border-strong: rgba(255, 255, 255, 0.18);
+  --border-accent: rgba(79, 156, 249, 0.45);
+
+  --text-primary: #F8FAFC;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --text-inverse: #0F172A;
+  --text-navy: #93C5FD;
+
+  --color-income-bg: rgba(16, 185, 129, 0.15);
+  --color-expense-bg: rgba(239, 68, 68, 0.15);
+  --color-savings-bg: rgba(79, 156, 249, 0.15);
+
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 20px 45px rgba(0, 0, 0, 0.5);
+}
+
+/* Global Reset */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--bg-app);
+  color: var(--text-primary);
+  min-height: 100vh;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(79, 156, 249, 0.07) 0px, transparent 45%),
+    radial-gradient(at 100% 20%, rgba(255, 228, 146, 0.08) 0px, transparent 35%);
+  background-attachment: fixed;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+/* Typography */
+h1, h2, h3, h4, .font-display {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--text-navy);
+}
+
+.num-font {
+  font-family: var(--font-display);
+  font-feature-settings: 'tnum';
+  font-variant-numeric: tabular-nums;
+}
+
+/* Containers */
+.app-container {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 1.5rem 1.5rem 5rem;
+}
+
+/* Whitepace SaaS Header */
+.header-container {
+  position: sticky;
+  top: 1.25rem;
+  z-index: 100;
+  margin-bottom: 2rem;
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface-glass);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--border-subtle);
+  padding: 0.9rem 1.75rem;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.brand-section {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.brand-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--wp-navy-dark) 0%, var(--wp-blue-primary) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(79, 156, 249, 0.35);
+}
+
+.brand-title {
+  font-size: 1.3rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.brand-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.15rem 0.55rem;
+  border-radius: var(--radius-full);
+  background: var(--wp-blue-light);
+  color: var(--wp-navy-dark);
+  border: 1px solid rgba(79, 156, 249, 0.3);
+}
+
+.brand-subtitle {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+/* Whitepace Hero Banner */
+.whitepace-hero {
+  background: linear-gradient(135deg, var(--wp-navy-dark) 0%, #032857 60%, #054894 100%);
+  color: #FFFFFF;
+  border-radius: var(--radius-lg);
+  padding: 3rem 2.5rem;
+  margin-bottom: 2.25rem;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+.whitepace-hero::after {
+  content: '';
+  position: absolute;
+  top: -50px;
+  right: -50px;
+  width: 250px;
+  height: 250px;
+  background: radial-gradient(circle, rgba(79, 156, 249, 0.25) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
+  padding: 0.35rem 0.85rem;
+  border-radius: var(--radius-full);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--wp-yellow-accent);
+  margin-bottom: 1.25rem;
+  border: 1px solid rgba(255, 228, 146, 0.3);
+}
+
+.hero-title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  line-height: 1.28;
+  color: #FFFFFF;
+  margin-bottom: 1rem;
+}
+
+.hero-title span {
+  color: var(--wp-blue-primary);
+}
+
+.hero-desc {
+  font-size: 1.05rem;
+  color: #CBD5E1;
+  max-width: 680px;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+}
+
+.hero-trust-row {
+  display: flex;
+  align-items: center;
+  gap: 1.75rem;
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  flex-wrap: wrap;
+  font-size: 0.84rem;
+  color: #94A3B8;
+}
+
+.hero-trust-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #E2E8F0;
+  font-weight: 500;
+}
+
+/* Whitepace SaaS Button Styles */
+.btn-wp-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  background: var(--wp-blue-primary);
+  color: #FFFFFF;
+  padding: 0.8rem 1.6rem;
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  font-size: 0.95rem;
+  box-shadow: 0 4px 14px rgba(79, 156, 249, 0.4);
+  transition: all 0.2s ease;
+}
+
+.btn-wp-primary:hover {
+  background: var(--wp-blue-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(79, 156, 249, 0.5);
+}
+
+.btn-wp-accent {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  background: var(--wp-yellow-accent);
+  color: var(--wp-navy-dark);
+  padding: 0.8rem 1.5rem;
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  font-size: 0.95rem;
+  box-shadow: 0 4px 14px rgba(255, 228, 146, 0.4);
+  transition: all 0.2s ease;
+}
+
+.btn-wp-accent:hover {
+  background: var(--wp-yellow-hover);
+  transform: translateY(-2px);
+}
+
+.btn-wp-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 0.8rem 1.4rem;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.92rem;
+  transition: all 0.2s ease;
+}
+
+.btn-wp-outline:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #FFFFFF;
+}
+
+/* Whitepace SaaS Cards */
+.wp-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.wp-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-accent);
+}
+
+/* Navigation Tabs */
+.tabs-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--bg-surface);
+  padding: 0.45rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-subtle);
+  margin-bottom: 2rem;
+  overflow-x: auto;
+  box-shadow: var(--shadow-sm);
+}
+
+.tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.75rem 1.4rem;
+  border-radius: var(--radius-md);
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.tab-btn:hover {
+  color: var(--wp-navy-dark);
+  background: var(--wp-blue-tint);
+}
+
+.tab-btn.active {
+  background: var(--wp-navy-dark);
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(4, 56, 115, 0.25);
+}
+
+/* KPI Grid */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.35rem;
+  margin-bottom: 2.25rem;
+}
+
+.kpi-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.9rem;
+}
+
+.kpi-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.kpi-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.kpi-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kpi-value {
+  font-size: 1.95rem;
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--text-navy);
+}
+
+.kpi-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.kpi-pill {
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-full);
+  font-weight: 700;
+  font-size: 0.78rem;
+}
+
+/* Visualizations Layout Grid */
+.charts-grid-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.75rem;
+  margin-bottom: 2.25rem;
+}
+
+@media (max-width: 960px) {
+  .charts-grid-2col {
+    grid-template-columns: 1fr;
+  }
+}
+
+.chart-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.chart-title-group h3 {
+  font-size: 1.2rem;
+  margin-bottom: 0.3rem;
+  color: var(--text-navy);
+}
+
+.chart-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+/* Security & Controls */
+.controls-section {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.privacy-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: var(--radius-full);
+  background: var(--color-income-bg);
+  color: var(--color-income);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.privacy-badge .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--color-income);
+  box-shadow: 0 0 8px var(--color-income);
+  animation: pulse 2s infinite;
+}
+
+.timer-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.85rem;
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.timer-count {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--wp-navy-dark);
+}
+
+.btn-extend {
+  background: var(--wp-blue-light);
+  color: var(--wp-navy-dark);
+  border: 1px solid rgba(79, 156, 249, 0.3);
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.78rem;
+  font-weight: 700;
+  transition: all 0.15s ease;
+}
+
+.btn-extend:hover {
+  background: var(--wp-blue-primary);
+  color: #FFFFFF;
+}
+
+.btn-panic {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: var(--radius-full);
+  background: var(--color-expense-bg);
+  color: var(--color-expense);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  font-size: 0.8rem;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.btn-panic:hover {
+  background: var(--color-expense);
+  color: #FFFFFF;
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.4);
+}
+
+.theme-toggle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+}
+
+.theme-toggle:hover {
+  color: var(--text-navy);
+  border-color: var(--border-strong);
+}
+
+/* Modals */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: rgba(4, 56, 115, 0.55);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal-content {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  max-width: 580px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+  padding: 2rem;
+  position: relative;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.modal-close {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  transition: all 0.15s ease;
+}
+
+.modal-close:hover {
+  background: var(--bg-surface-elevated);
+  color: var(--text-primary);
+}
+
+/* Forms & Dropzones */
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin-bottom: 0.45rem;
+}
+
+.form-input, .form-select {
+  width: 100%;
+  padding: 0.75rem 0.95rem;
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  outline: none;
+  font-weight: 500;
+  transition: border-color 0.2s ease;
+}
+
+.form-input:focus, .form-select:focus {
+  border-color: var(--wp-blue-primary);
+  box-shadow: 0 0 0 3px rgba(79, 156, 249, 0.15);
+}
+
+.dropzone {
+  border: 2px dashed var(--border-strong);
+  border-radius: var(--radius-md);
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  background: var(--wp-blue-tint);
+  transition: all 0.2s ease;
+}
+
+.dropzone:hover, .dropzone.active {
+  border-color: var(--wp-blue-primary);
+  background: var(--wp-blue-light);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.15); }
+}
+
+/* Print/PDF Export */
+@media print {
+  body {
+    background: #FFFFFF !important;
+    color: #000000 !important;
+  }
+  .header-container, .whitepace-hero, .tabs-container, .btn-panic, .theme-toggle, .btn-extend, .hero-actions {
+    display: none !important;
+  }
+  .wp-card {
+    background: #FFFFFF !important;
+    border: 1px solid #E2E8F0 !important;
+    box-shadow: none !important;
+    page-break-inside: avoid;
+  }
+  .app-container {
+    padding: 0 !important;
+    max-width: 100% !important;
+  }
+}
