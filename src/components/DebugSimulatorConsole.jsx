@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Wrench, 
   ChevronUp, 
@@ -11,7 +11,11 @@ import {
   CheckCircle2, 
   XCircle,
   Play,
-  RotateCcw
+  RotateCcw,
+  Lock,
+  Unlock,
+  KeyRound,
+  ShieldCheck
 } from 'lucide-react';
 
 export default function DebugSimulatorConsole({ 
@@ -28,12 +32,87 @@ export default function DebugSimulatorConsole({
   const [latencyActive, setLatencyActive] = useState(false);
   const [showJsonInspector, setShowJsonInspector] = useState(false);
 
+  // 관리자 인증 상태 (로컬 호스트는 기본 통과, 외부 배포 도메인은 토큰 필요)
+  const isLocalHost = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+  const [adminToken, setAdminToken] = useState(() => {
+    if (typeof window === 'undefined') return '';
+    // URL 쿼리 파라미터 ?token=... 우선 확인
+    const urlParams = new URLSearchParams(window.location.search);
+    const qToken = urlParams.get('token');
+    if (qToken) {
+      sessionStorage.setItem('finwise_admin_token', qToken);
+      return qToken;
+    }
+    return sessionStorage.getItem('finwise_admin_token') || '';
+  });
+
+  const [isUnlocked, setIsUnlocked] = useState(isLocalHost);
+  const [inputToken, setInputToken] = useState('');
+  const [authError, setAuthError] = useState('');
+  const [isVerifying, setIsVerifying] = useState(false);
+
+  // 세션 스토리지 또는 URL에 토큰이 있는 경우 자동 검증
+  useEffect(() => {
+    if (isLocalHost) {
+      setIsUnlocked(true);
+      return;
+    }
+    if (adminToken) {
+      verifyToken(adminToken, false);
+    }
+  }, [adminToken, isLocalHost]);
+
+  const verifyToken = async (tokenToTest, showToast = true) => {
+    setIsVerifying(true);
+    setAuthError('');
+    try {
+      const res = await fetch('/api/debug/verify-token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: tokenToTest })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setIsUnlocked(true);
+        setAdminToken(tokenToTest);
+        sessionStorage.setItem('finwise_admin_token', tokenToTest);
+        if (showToast) {
+          onShowNotification('관리자 디버그 권한이 인증되었습니다.', 'success');
+        }
+      } else {
+        setIsUnlocked(false);
+        setAuthError(data.error || '토큰이 일치하지 않습니다.');
+      }
+    } catch (e) {
+      setAuthError('서버 연결 실패');
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
+  const handleAdminAuthSubmit = (e) => {
+    e.preventDefault();
+    if (!inputToken.trim()) return;
+    verifyToken(inputToken.trim(), true);
+  };
+
+  const handleLockConsole = () => {
+    sessionStorage.removeItem('finwise_admin_token');
+    setAdminToken('');
+    setInputToken('');
+    setIsUnlocked(false);
+    onShowNotification('관리자 디버그 모드가 잠겼습니다.', 'info');
+  };
+
   // 1. 카오스 설정 전송
   const updateChaos = async (errorState, latencyState) => {
     try {
       await fetch('/api/debug/chaos', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'x-admin-token': adminToken
+        },
         body: JSON.stringify({
           simulateHometaxError: errorState,
           simulateLatencyMs: latencyState ? 3000 : 0
@@ -137,16 +216,107 @@ export default function DebugSimulatorConsole({
 
       {isOpen && (
         <div style={{ padding: '1.15rem', maxHeight: '72vh', overflowY: 'auto' }}>
-          <div style={{ fontSize: '0.74rem', color: '#CBD5E1', marginBottom: '1rem', background: 'rgba(0, 0, 0, 0.25)', padding: '0.5rem 0.75rem', borderRadius: '8px' }}>
-            🔒 <strong>보안 상태:</strong> 서버 로컬(127.0.0.1) 격리 활성화됨. 외부 접속 차단 중.
-          </div>
+          {/* 관리자 권한 잠금 화면 (토큰 미인증 시) */}
+          {!isUnlocked ? (
+            <div style={{ textAlign: 'center', padding: '0.75rem 0.25rem' }}>
+              <div style={{
+                width: '44px', height: '44px', borderRadius: '50%',
+                background: 'rgba(239, 68, 68, 0.2)', border: '1px solid rgba(239, 68, 68, 0.4)',
+                color: '#F87171', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                margin: '0 auto 0.75rem'
+              }}>
+                <Lock size={22} />
+              </div>
+              <div style={{ fontWeight: 800, fontSize: '0.92rem', color: '#FFFFFF', marginBottom: '0.35rem' }}>
+                관리자 인증 필요 (Admin Lock)
+              </div>
+              <p style={{ fontSize: '0.76rem', color: '#94A3B8', marginBottom: '1rem', lineHeight: 1.4 }}>
+                실제 서비스 보안을 위해 인가된 관리자만 시뮬레이터 및 카오스 제어에 접근할 수 있습니다.
+              </p>
 
-          {/* 1. 페르소나 시나리오 원클릭 전환 */}
-          <div style={{ marginBottom: '1.15rem' }}>
-            <div style={{ fontWeight: 700, fontSize: '0.82rem', color: 'var(--wp-yellow-accent)', marginBottom: '0.45rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-              <Users size={14} />
-              <span>원클릭 금융 페르소나 시나리오</span>
+              <form onSubmit={handleAdminAuthSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type="password"
+                    placeholder="관리자 인증 토큰 / 시크릿 키 입력"
+                    value={inputToken}
+                    onChange={(e) => setInputToken(e.target.value)}
+                    style={{
+                      width: '100%',
+                      background: '#021833',
+                      border: authError ? '1px solid #EF4444' : '1px solid rgba(79, 156, 249, 0.35)',
+                      borderRadius: '8px',
+                      padding: '0.55rem 0.75rem',
+                      color: '#FFFFFF',
+                      fontSize: '0.82rem',
+                      outline: 'none'
+                    }}
+                  />
+                </div>
+
+                {authError && (
+                  <div style={{ fontSize: '0.72rem', color: '#F87171', textAlign: 'left' }}>
+                    ⚠️ {authError}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={isVerifying}
+                  style={{
+                    background: 'var(--wp-yellow-accent)',
+                    color: 'var(--wp-navy-dark)',
+                    fontWeight: 800,
+                    padding: '0.55rem',
+                    borderRadius: '8px',
+                    border: 'none',
+                    fontSize: '0.82rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.35rem'
+                  }}
+                >
+                  <KeyRound size={14} />
+                  <span>{isVerifying ? '토큰 검증 중...' : '관리자 디버그 콘솔 잠금 해제'}</span>
+                </button>
+              </form>
+
+              <div style={{ fontSize: '0.68rem', color: '#64748B', marginTop: '0.85rem' }}>
+                Tip: URL에 <code>?debug=true&token=관리자키</code>로 다이렉트 자동 인증 가능
+              </div>
             </div>
+          ) : (
+            <>
+              <div style={{ 
+                fontSize: '0.74rem', color: '#CBD5E1', marginBottom: '1rem', 
+                background: 'rgba(0, 0, 0, 0.25)', padding: '0.5rem 0.75rem', borderRadius: '8px',
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                  <ShieldCheck size={14} style={{ color: '#10B981' }} />
+                  <span><strong>관리자 권한 승인됨:</strong> {isLocalHost ? '로컬 호스트' : '시크릿 토큰 인증'}</span>
+                </div>
+                {!isLocalHost && (
+                  <button 
+                    onClick={handleLockConsole}
+                    style={{
+                      background: 'rgba(239, 68, 68, 0.2)', border: '1px solid rgba(239, 68, 68, 0.4)',
+                      color: '#FCA5A5', padding: '0.2rem 0.45rem', borderRadius: '4px', fontSize: '0.68rem', cursor: 'pointer'
+                    }}
+                  >
+                    잠금
+                  </button>
+                )}
+              </div>
+
+              {/* 1. 페르소나 시나리오 원클릭 전환 */}
+              <div style={{ marginBottom: '1.15rem' }}>
+                <div style={{ fontWeight: 700, fontSize: '0.82rem', color: 'var(--wp-yellow-accent)', marginBottom: '0.45rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                  <Users size={14} />
+                  <span>원클릭 금융 페르소나 시나리오</span>
+                </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
               <button
                 type="button"
@@ -325,13 +495,14 @@ export default function DebugSimulatorConsole({
                   fixedExpenseRatio: analytics.fixedExpenseRatio,
                   peakWindow: analytics.peakWindow,
                   weekendRatio: analytics.weekendRatio,
-                  topCategory: analytics.categoryBreakdown?.[0]?.category
                 }, null, 2)}
               </pre>
             )}
           </div>
-        </div>
+        </>
       )}
-    </aside>
-  );
+    </div>
+  )}
+</aside>
+);
 }

@@ -10,6 +10,7 @@ import benchmarkRoutes from './routes/benchmark.js';
 import adviceRoutes from './routes/advice.js';
 import openbankingRoutes from './routes/openbanking.js';
 import authRoutes from './routes/auth.js';
+import debugRoutes from './routes/debug.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -27,6 +28,7 @@ app.use('/api/openbanking', openbankingRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/benchmark', benchmarkRoutes);
 app.use('/api/advice', adviceRoutes);
+app.use('/api/debug', debugRoutes);
 
 // Health Check
 app.get('/api/health', (req, res) => {

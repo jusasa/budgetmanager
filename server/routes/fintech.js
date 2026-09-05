@@ -1,5 +1,6 @@
 // FinTech & National Tax Service (국세청) Integration Route with Real Institutions
 import { Router } from 'express';
+import { chaosState } from './debug.js';
 
 const router = Router();
 
@@ -201,8 +202,20 @@ function generateInstitutionalFinancialData(selectedIds = ['hometax', 'kb_bank',
 }
 
 // 2. 다중 금융기관 마이데이터/오픈뱅킹 연동 API
-router.post('/sync-institutions', (req, res) => {
+router.post('/sync-institutions', async (req, res) => {
   const { selectedInstitutions = [], authMethod = 'kakao', userName = '홍*동' } = req.body;
+
+  // 카오스 지연 시뮬레이션
+  if (chaosState.simulateLatencyMs > 0) {
+    await new Promise((r) => setTimeout(r, chaosState.simulateLatencyMs));
+  }
+
+  // 카오스 국세청 오류 시뮬레이션
+  if (chaosState.simulateHometaxError && selectedInstitutions.includes('hometax')) {
+    return res.status(500).json({
+      error: '[국세청 홈택스 시스템 에러 (500)] 연말정산 간소화 서비스 일시 장애가 발생했습니다. (카오스 엔지니어링 테스트)'
+    });
+  }
 
   if (!selectedInstitutions || selectedInstitutions.length === 0) {
     return res.status(400).json({
