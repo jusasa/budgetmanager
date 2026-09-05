@@ -19,7 +19,7 @@ function extractCleanJson(text) {
     if (match) {
       try {
         return JSON.parse(match[0]);
-      } catch (err) {}
+      } catch (err) { }
     }
   }
   return null;
@@ -81,7 +81,7 @@ router.post('/generate', async (req, res) => {
   };
 
   const openRouterKey = process.env.OPENROUTER_API_KEY;
-  const openRouterModel = process.env.OPENROUTER_MODEL || 'deepseek/deepseek-v4-flash-0731';
+  const openRouterModel = process.env.OPENROUTER_MODEL;
 
   // 1. 실제 서비스 모드이거나 사용자가 실시간 AI 생성을 요청한 경우 (키 등록 시)
   if ((!isSimulation || forceRealAi) && openRouterKey && openRouterKey.trim().length > 0) {
@@ -115,8 +115,8 @@ Output valid JSON format with actionItems array and aiSummary.`;
           model: openRouterModel,
           messages: [
             { role: 'system', content: systemPrompt },
-            { 
-              role: 'user', 
+            {
+              role: 'user',
               content: `아래 지표를 바탕으로 이 사용자를 위한 4가지 차별화된 맞춤형 자산 최적화 액션플랜을 작성해주세요:\n${JSON.stringify(userMetrics, null, 2)}\n\n반드시 아래 JSON 형식으로만 응답해주세요:
 {
   "actionItems": [
@@ -129,7 +129,9 @@ Output valid JSON format with actionItems array and aiSummary.`;
 }`
             }
           ],
-          max_tokens: 1500
+          max_tokens: 3000,
+          reasoning: { effort: 'low' },
+          response_format: { type: 'json_object' }
         })
       });
 
